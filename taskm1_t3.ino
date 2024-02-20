@@ -1,31 +1,12 @@
 #define pirPin 2
-#define buttonPin 3  
-#define motionLedPin 8  
-#define buttonLedPin 4  
+#define buttonPin 3
+#define motionLedPin 8
+#define buttonLedPin 4
 
 volatile bool isMotionDetected = false;
 volatile bool isButtonPressed = false;
 
-void interruptPIR() {
-    isMotionDetected = true;
-}
-
-void interruptButton() {
-    isButtonPressed = true;
-}
-
-void setup() {
-    pinMode(pirPin, INPUT);
-    pinMode(buttonPin, INPUT_PULLUP);  
-    pinMode(motionLedPin, OUTPUT);
-    pinMode(buttonLedPin, OUTPUT);
-    Serial.begin(9600);
-
-    attachInterrupt(digitalPinToInterrupt(pirPin), interruptPIR, RISING);
-    attachInterrupt(digitalPinToInterrupt(buttonPin), interruptButton, FALLING);
-}
-
-void loop() {
+void controlLEDs() {
     if (isMotionDetected) {
         digitalWrite(motionLedPin, HIGH);
         Serial.println("Motion detected! Turning on Motion LED.");
@@ -41,6 +22,29 @@ void loop() {
     } else {
         digitalWrite(buttonLedPin, LOW);
     }
+}
 
-    delay(1000);
+void interruptPIR() {
+    isMotionDetected = true;
+    controlLEDs();
+}
+
+void interruptButton() {
+    isButtonPressed = true;
+    controlLEDs();
+}
+
+void setup() {
+    pinMode(pirPin, INPUT);
+    pinMode(buttonPin, INPUT_PULLUP);
+    pinMode(motionLedPin, OUTPUT);
+    pinMode(buttonLedPin, OUTPUT);
+    Serial.begin(9600);
+
+    attachInterrupt(digitalPinToInterrupt(pirPin), interruptPIR, RISING);
+    attachInterrupt(digitalPinToInterrupt(buttonPin), interruptButton, FALLING);
+}
+
+void loop() {
+    // Empty loop
 }
